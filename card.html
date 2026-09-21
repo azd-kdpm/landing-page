@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXUS — Visiting Card</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Local QR Code Engine (100% Offline Capable) -->
+  <script src="assets/qrcode.min.js"></script>
+
+  <!-- Embedded Base64 Caricatures (100% Offline & File:/// Safe - Zero Canvas Tainting) -->
+  <script src="assets/caricatures_data.js"></script>
+
+  <style>
+    body {
+      font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+      background-color: #08090c;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    .font-mono-brand {
+      font-family: 'Space Grotesk', monospace, sans-serif;
+    }
+
+    /* Card Luxury Matte Black Finish on Display */
+    .visiting-card-matte {
+      background: #111317;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+
+    /* Print Specific Styling: Pure #000000 Black, Exact 2" x 3.5" */
+    @media print {
+      @page {
+        size: 2in 3.5in;
+        margin: 0;
+      }
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #000000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      body * {
+        visibility: hidden !important;
+      }
+      #print-card-wrapper, #print-card-wrapper * {
+        visibility: visible !important;
+      }
+      #print-card-wrapper {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 2in !important;
+        height: 3.5in !important;
+        margin: 0 !important;
+        padding: 0.15in !important;
+        background: #000000 !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-white selection:text-black">
+
+  <!-- Subtle Ambient Glow -->
+  <div class="fixed top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-white/[0.02] rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- Top Navigation & Profile Switcher -->
+  <header class="w-full max-w-md mx-auto px-4 pt-6 flex items-center justify-between no-print">
+    <!-- Brand Return to Main Website -->
+    <a href="index.html" class="flex items-center gap-2 group" title="Return to Main Portfolio">
+      <div class="w-8 h-8 rounded-xl bg-white text-black font-extrabold flex items-center justify-center font-mono-brand text-sm shadow group-hover:scale-105 transition-transform">
+        N
+      </div>
+      <div>
+        <div class="font-bold text-xs tracking-widest text-white">NEXUS</div>
+        <div class="text-[10px] text-zinc-500">&larr; Website</div>
+      </div>
+    </a>
+
+    <!-- Founder Toggle: Ansarullah / Asadullah -->
+    <div class="flex items-center gap-1 p-1 bg-zinc-900 border border-zinc-800 rounded-xl">
+      <button id="btn-switch-ansar" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-black shadow-sm" data-partner="partner2">
+        Ansarullah
+      </button>
+      <button id="btn-switch-asad" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-400 hover:text-white" data-partner="partner1">
+        Asadullah
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Card Display Showcase -->
+  <main class="w-full max-w-md mx-auto px-4 py-8 flex flex-col items-center">
+
+    <!-- Notice -->
+    <div class="text-center mb-4 no-print">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900/90 border border-zinc-800 text-[11px] font-medium text-zinc-400">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span>Minimalist Card &bull; Matte Black Screen &bull; 000000 Print</span>
+      </span>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- VISITING CARD CONTAINER (Exact User Red-Sketch Specification) -->
+    <!-- Top ~65%: Only QR code (no white border, qr code in white)   -->
+    <!-- Bottom ~35%: No texts - only name & mobile number            -->
+    <!-- Right side: Image beside text, NOT in square box             -->
+    <!-- Background on show: Matte Black (#111317)                    -->
+    <!-- Background on download/print: Pure Black (#000000)           -->
+    <!-- ============================================================ -->
+    <div id="print-card-wrapper" class="w-full max-w-[340px] sm:max-w-[360px] aspect-[1/1.75] min-h-[590px] sm:min-h-[620px] rounded-[32px] visiting-card-matte p-6 sm:p-7 flex flex-col justify-between relative overflow-hidden select-none">
+
+      <!-- TOP SECTION: ONLY WHITE QR CODE (NO WHITE BORDER / NO WHITE PLATE) -->
+      <div class="h-[65%] flex items-center justify-center relative">
+        <div id="card-qr-container" class="w-[220px] h-[220px] sm:w-[240px] sm:h-[240px] flex items-center justify-center bg-transparent">
+          <!-- Inverted pure white QR code injected here -->
+        </div>
+      </div>
+
+      <!-- BOTTOM SECTION: NO TEXTS — ONLY NAME, MOBILE NUMBER & FREE-FLOATING IMAGE -->
+      <div class="h-[35%] flex items-end justify-between gap-3 pt-2">
+        
+        <!-- Left Side: Only Full Name & Mobile Number -->
+        <div class="flex-1 min-w-0 pb-1">
+          <!-- Full Name -->
+          <div id="card-name" class="text-2xl sm:text-[28px] font-black text-white uppercase tracking-tight leading-none font-mono-brand">
+            ANSARULLAH<br>K. P.
+          </div>
+          <!-- Mobile Number -->
+          <div id="card-phone" class="text-base sm:text-lg font-bold text-zinc-200 font-mono tracking-wider mt-3">
+            +91 98479 14570
+          </div>
+        </div>
+
+        <!-- Right Side: Mini Image of Us (No Square Box, Seamless on Black) -->
+        <div class="shrink-0 flex items-end justify-center">
+          <img id="card-mini-image" src="assets/ansar-caricature.jpg" alt="Caricature" class="w-24 h-28 sm:w-28 sm:h-32 object-contain object-bottom select-none pointer-events-none" style="mix-blend-mode: screen;">
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- DOWNLOAD & PRINT ACTIONS                                     -->
+    <!-- ============================================================ -->
+    <div class="w-full max-w-[340px] sm:max-w-[360px] mt-6 space-y-3 no-print">
+      
+      <!-- Download HQ PNG (Pure #000000 Black, 300 DPI) -->
+      <button id="btn-download-card" class="w-full py-4 px-4 rounded-2xl bg-white text-black hover:bg-zinc-200 active:scale-95 font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl shadow-white/5 transition-all">
+        <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span>Download Card (HQ 300 DPI PNG)</span>
+      </button>
+
+      <!-- Print Card (Standard 2" x 3.5") -->
+      <button onclick="window.print()" class="w-full py-3 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 active:scale-95 text-zinc-300 hover:text-white border border-zinc-800 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all">
+        <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+        <span>Print Card (2" &times; 3.5")</span>
+      </button>
+
+    </div>
+
+  </main>
+
+  <!-- Minimal Footer with Stealth Owner Lock -->
+  <footer class="w-full max-w-md mx-auto px-4 py-6 text-center text-xs text-zinc-600 no-print border-t border-zinc-900 space-y-2">
+    <div>NEXUS &bull; CCTV / Home Automation / ELV</div>
+    <div class="flex items-center justify-center gap-3">
+      <a href="index.html" class="text-zinc-500 hover:text-zinc-300 underline">Portfolio</a>
+      <a href="admin.html" title="Owner Portal (PIN: 0169)" class="text-zinc-800 hover:text-zinc-500 transition-colors" aria-label="Admin Portal">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      </a>
+    </div>
+  </footer>
+
+  <!-- Modal Preview fallback for mobile / touch devices -->
+  <div id="preview-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden items-center justify-center p-4 no-print">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl max-w-sm w-full p-5 text-center space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+        <span class="text-xs font-bold text-white uppercase tracking-wider">Card Ready</span>
+        <button id="btn-close-modal" class="text-zinc-400 hover:text-white text-sm font-bold">&times; Close</button>
+      </div>
+      <p class="text-xs text-zinc-400">Card downloaded! If your browser prevented automatic download, long-press the card below to save image directly:</p>
+      <div class="rounded-2xl overflow-hidden border border-zinc-800 shadow-lg bg-black">
+        <img id="modal-card-preview" src="" alt="Card Preview" class="w-full h-auto object-contain">
+      </div>
+      <a id="modal-download-link" href="#" download="" class="block w-full py-3 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-wider">
+        Save Image (PNG)
+      </a>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl bg-zinc-900 text-white text-xs border border-zinc-700 shadow-2xl transition-all opacity-0 translate-y-4 pointer-events-none">
+    <span id="toast-text">Notification</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Sync overrides from localStorage if present
+      const savedConfig = localStorage.getItem('nexus_custom_config');
+      if (savedConfig) {
+        try {
+          const parsed = JSON.parse(savedConfig);
+          if (parsed.configVersion === siteConfig.configVersion) {
+            if (parsed.brand) Object.assign(siteConfig.brand, parsed.brand);
+            if (parsed.partners) {
+              if (parsed.partners.partner1) Object.assign(siteConfig.partners.partner1, parsed.partners.partner1);
+              if (parsed.partners.partner2) Object.assign(siteConfig.partners.partner2, parsed.partners.partner2);
+            }
+          }
+        } catch (e) {
+          console.warn('Could not parse local config', e);
+        }
+      }
+
+      let activePartner = 'partner2'; // Default: Ansarullah K. P.
+
+      // DOM references
+      const cardName = document.getElementById('card-name');
+      const cardPhone = document.getElementById('card-phone');
+      const cardMiniImage = document.getElementById('card-mini-image');
+      const cardQrContainer = document.getElementById('card-qr-container');
+      const btnSwitchAnsar = document.getElementById('btn-switch-ansar');
+      const btnSwitchAsad = document.getElementById('btn-switch-asad');
+      const btnDownloadCard = document.getElementById('btn-download-card');
+      const previewModal = document.getElementById('preview-modal');
+      const modalCardPreview = document.getElementById('modal-card-preview');
+      const modalDownloadLink = document.getElementById('modal-download-link');
+      const btnCloseModal = document.getElementById('btn-close-modal');
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toast-text');
+
+      // Check URL query param e.g. ?profile=partner1 or ?profile=partner2
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramP = urlParams.get('profile') || urlParams.get('p') || urlParams.get('user');
+      if (paramP && siteConfig.partners[paramP]) {
+        activePartner = paramP;
+      }
+
+      function showToast(msg) {
+        if (!toast) return;
+        toastText.textContent = msg;
+        toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+        setTimeout(() => {
+          toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+        }, 3000);
+      }
+
+      if (btnCloseModal) {
+        btnCloseModal.addEventListener('click', () => {
+          previewModal.classList.add('hidden');
+          previewModal.classList.remove('flex');
+        });
+      }
+
+      // Generate local QR Code with QRCode.js (White on transparent background)
+      function generateQrCode(url) {
+        cardQrContainer.innerHTML = '';
+        try {
+          if (typeof QRCode !== 'undefined') {
+            new QRCode(cardQrContainer, {
+              text: url,
+              width: 240,
+              height: 240,
+              colorDark: "#ffffff",
+              colorLight: "rgba(0,0,0,0)",
+              correctLevel: QRCode.CorrectLevel.H
+            });
+          }
+        } catch (err) {
+          console.error('QR generation error:', err);
+        }
+      }
+
+      // Render the Visiting Card
+      function renderCard(partnerId) {
+        activePartner = partnerId;
+        const partner = siteConfig.partners[partnerId];
+        if (!partner) return;
+
+        // Split name into first and last line as per sketch (e.g. ANSARULLAH \n K. P.)
+        const nameParts = partner.name.trim().split(' ');
+        let nameHtml = partner.name.toUpperCase();
+        if (nameParts.length >= 2) {
+          const firstPart = nameParts.slice(0, -2).join(' ') || nameParts[0];
+          const lastPart = nameParts.slice(-2).join(' ');
+          nameHtml = `${firstPart.toUpperCase()}<br>${lastPart.toUpperCase()}`;
+        }
+        cardName.innerHTML = nameHtml;
+
+        // Phone Number
+        cardPhone.textContent = partner.phoneDisplay;
+
+        // Caricature Image from Base64 (Zero canvas tainting, instant render)
+        const b64 = (typeof caricatureData !== 'undefined' && caricatureData[partnerId]) 
+          ? caricatureData[partnerId] 
+          : (partnerId === 'partner1' ? 'assets/asad-caricature.jpg' : 'assets/ansar-caricature.jpg');
+        cardMiniImage.src = b64;
+        cardMiniImage.alt = partner.name;
+
+        // Generate Inverted White QR Code linking to full portfolio
+        const baseUrl = window.location.href.split('#')[0].split('?')[0].replace('card.html', 'index.html');
+        const cardUrl = `${baseUrl}?profile=${partnerId}`;
+        generateQrCode(cardUrl);
+
+        // Update Toggle Switchers
+        if (partnerId === 'partner2') {
+          btnSwitchAnsar.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-black shadow-sm';
+          btnSwitchAsad.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-400 hover:text-white';
+        } else {
+          btnSwitchAsad.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-black shadow-sm';
+          btnSwitchAnsar.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-400 hover:text-white';
+        }
+      }
+
+      // Partner Switch Buttons
+      btnSwitchAnsar.addEventListener('click', () => renderCard('partner2'));
+      btnSwitchAsad.addEventListener('click', () => renderCard('partner1'));
+
+      // ============================================================
+      // 300 DPI HQ PRINT CARD DOWNLOAD ENGINE (PURE #000000 BLACK)
+      // Exact User Drawing Layout:
+      // Top: White QR Code (No white border, no plate)
+      // Bottom: Name & Phone Number on Left, Caricature on Right (No box)
+      // ============================================================
+      btnDownloadCard.addEventListener('click', async () => {
+        showToast('Generating 300 DPI Black Card...');
+        const partner = siteConfig.partners[activePartner];
+        const filename = `Nexus_Card_${partner.name.replace(/[^a-zA-Z0-9]/g, '_')}_000000.png`;
+
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = 1200;
+          canvas.height = 2100;
+          const ctx = canvas.getContext('2d');
+
+          // 1. Pure #000000 Black Background (Requested by user)
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(0, 0, 1200, 2100);
+
+          // 2. Top Area: White QR Code (No white box, no white border)
+          const qrImg = cardQrContainer.querySelector('img') || cardQrContainer.querySelector('canvas');
+          if (qrImg) {
+            const qrSize = 900;
+            const qrX = (1200 - qrSize) / 2; // 150
+            const qrY = 180;
+            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+          }
+
+          // 3. Bottom Area: Caricature on Right (No square box, seamless on black)
+          const b64 = (typeof caricatureData !== 'undefined' && caricatureData[activePartner]) 
+            ? caricatureData[activePartner] 
+            : (activePartner === 'partner1' ? 'assets/asad-caricature.jpg' : 'assets/ansar-caricature.jpg');
+
+          const carImg = new Image();
+          carImg.onload = () => {
+            // Draw caricature seamlessly onto pure black canvas
+            const carWidth = 460;
+            const carHeight = 560;
+            const carX = 640;
+            const carY = 1380;
+            ctx.drawImage(carImg, carX, carY, carWidth, carHeight);
+
+            // 4. Bottom Area: Left Side — Name & Mobile Number (No other text)
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'left';
+
+            // Split name into first and last line
+            const nameParts = partner.name.trim().split(' ');
+            let line1 = partner.name.toUpperCase();
+            let line2 = '';
+            if (nameParts.length >= 2) {
+              line1 = (nameParts.slice(0, -2).join(' ') || nameParts[0]).toUpperCase();
+              line2 = nameParts.slice(-2).join(' ').toUpperCase();
+            }
+
+            ctx.font = '900 86px "Space Grotesk", sans-serif';
+            ctx.fillText(line1, 110, 1500);
+            if (line2) {
+              ctx.fillText(line2, 110, 1600);
+            }
+
+            // Mobile number
+            ctx.font = 'bold 64px monospace, "Space Grotesk", sans-serif';
+            ctx.fillText(partner.phoneDisplay, 110, 1730);
+
+            // 5. Export as High-Resolution PNG via Blob & Trigger Download
+            canvas.toBlob((blob) => {
+              if (blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                }, 2000);
+
+                // Also populate fallback preview modal for mobile users
+                modalCardPreview.src = url;
+                modalDownloadLink.href = url;
+                modalDownloadLink.download = filename;
+
+                showToast('✅ Visiting card downloaded!');
+              } else {
+                // Fallback to data URL
+                const dataUrl = canvas.toDataURL('image/png');
+                modalCardPreview.src = dataUrl;
+                modalDownloadLink.href = dataUrl;
+                modalDownloadLink.download = filename;
+                previewModal.classList.remove('hidden');
+                previewModal.classList.add('flex');
+              }
+            }, 'image/png');
+          };
+
+          carImg.onerror = (e) => {
+            console.error('Caricature load error:', e);
+            showToast('⚠️ Could not load caricature for download.');
+          };
+
+          carImg.src = b64;
+
+        } catch (err) {
+          console.error('Download card error:', err);
+          showToast('❌ Error generating card: ' + err.message);
+        }
+      });
+
+      // Initial Render
+      renderCard(activePartner);
+    });
+  </script>
+</body>
+</html>

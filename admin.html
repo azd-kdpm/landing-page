@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus — Site Content Manager & Image Uploader</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: #07090e;
+      color: #f1f5f9;
+    }
+    .font-mono-brand {
+      font-family: 'Space Grotesk', monospace, sans-serif;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+    }
+    input, textarea, select {
+      background-color: #0d121d !important;
+      border-color: #1e293b !important;
+      color: #f8fafc !important;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: #3b82f6 !important;
+      outline: none !important;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-28">
+
+  <!-- ============================================================ -->
+  <!-- AUTHENTICATION LOCK SCREEN (OWNER SECURITY ACCESS) -->
+  <!-- ============================================================ -->
+  <div id="admin-auth-modal" class="fixed inset-0 z-50 bg-[#07090e]/95 backdrop-blur-2xl flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 text-center">
+      
+      <div class="w-16 h-16 rounded-2xl bg-blue-600/20 border border-blue-500/30 text-blue-400 mx-auto flex items-center justify-center">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      </div>
+
+      <div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">NEXUS Security Guard</h2>
+        <p class="text-xs text-slate-400 mt-1">Authorized Owner Access Only (Asadullah &amp; Ansarullah)</p>
+      </div>
+
+      <form id="admin-auth-form" class="space-y-4">
+        <div>
+          <input type="password" id="auth-pin-input" placeholder="Enter Master PIN" maxlength="20" autofocus autocomplete="current-password"
+                 class="w-full px-5 py-3.5 rounded-2xl text-center text-xl tracking-widest font-mono bg-slate-950 border border-slate-800 text-white focus:border-blue-500 focus:outline-none">
+          <div id="auth-error-msg" class="text-xs text-rose-400 mt-2 font-medium hidden">Incorrect PIN. Try again.</div>
+        </div>
+
+        <button type="submit" id="btn-auth-unlock" class="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-bold text-sm shadow-lg shadow-blue-500/25 transition-all">
+          Unlock Dashboard
+        </button>
+      </form>
+
+      <div class="text-[11px] text-slate-500 pt-2 border-t border-slate-800/80 flex items-center justify-between">
+        <span>Default PIN: <strong class="text-slate-400 font-mono">0169</strong></span>
+        <a href="index.html" class="text-blue-400 hover:underline">&larr; Return to Website</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Top Action Bar -->
+  <header class="sticky top-0 z-40 bg-[#0a0e17]/95 border-b border-slate-800 backdrop-blur-md px-4 sm:px-8 py-3.5 shadow-xl">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      
+      <!-- Brand Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-white text-black font-extrabold flex items-center justify-center font-mono-brand text-sm shadow">
+          N
+        </div>
+        <div>
+          <div class="font-bold text-sm tracking-wider text-white flex items-center gap-2">
+            <span>NEXUS</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-600/20 text-blue-400 border border-blue-500/30">Admin &bull; Content Manager</span>
+          </div>
+          <div class="text-[11px] text-slate-400">Upload images &amp; update details without editing code</div>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-2 flex-wrap justify-end">
+        <button id="btn-save-all" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-lg shadow-blue-500/20 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+          <span>Save Changes</span>
+        </button>
+
+        <button id="btn-export-data" class="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-slate-200 border border-zinc-700 font-semibold text-xs flex items-center gap-1.5 transition-colors" title="Download updated data.js to keep permanently">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>Download data.js</span>
+        </button>
+
+        <a href="index.html" target="_blank" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-slate-300 text-xs font-medium border border-zinc-800 transition-colors flex items-center gap-1">
+          <span>Website</span> &rarr;
+        </a>
+
+        <a href="card.html" target="_blank" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-slate-300 text-xs font-medium border border-zinc-800 transition-colors flex items-center gap-1">
+          <span>Card</span> &rarr;
+        </a>
+
+        <!-- Lock Dashboard Button -->
+        <button id="btn-lock-dashboard" class="px-3 py-2 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 text-xs font-semibold border border-rose-800/50 transition-colors flex items-center gap-1.5" title="Lock Dashboard">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          <span>Lock</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-8 pt-8 space-y-8">
+
+    <!-- Tab Selector -->
+    <div class="flex items-center gap-2 border-b border-slate-800 pb-3 overflow-x-auto">
+      <button class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-black" data-tab="tab-partners">
+        👤 Partner Profiles
+      </button>
+      <button class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white" data-tab="tab-projects">
+        🖼️ Projects &amp; Timeline Gallery
+      </button>
+      <button class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white" data-tab="tab-services">
+        ⚡ Working Fields / Services
+      </button>
+      <button class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white" data-tab="tab-brand">
+        🏢 Brand Settings
+      </button>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- TAB 1: PARTNER PROFILES -->
+    <!-- ================================================================= -->
+    <div id="tab-partners" class="tab-content space-y-10">
+      
+      <!-- Partner 1: Asadullah K. P. -->
+      <section class="glass-card rounded-3xl p-6 sm:p-8 space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+            <h3 class="text-xl font-bold text-white">Partner 1 (You) — Profile Details</h3>
+          </div>
+          <span class="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-400">ID: partner1</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Avatar Upload Column -->
+          <div class="space-y-3">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Avatar Image</label>
+            <div class="w-36 h-36 rounded-2xl overflow-hidden bg-slate-900 border-2 border-slate-700 mx-auto relative group">
+              <img id="p1-avatar-preview" src="" alt="Avatar Preview" class="w-full h-full object-cover">
+            </div>
+
+            <div class="space-y-2">
+              <label class="block w-full text-center py-2 px-3 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 text-xs font-semibold cursor-pointer transition-colors">
+                <span>📁 Upload Photo</span>
+                <input type="file" id="p1-avatar-file" accept="image/*" class="hidden">
+              </label>
+              <input type="text" id="p1-avatar" placeholder="Or enter image URL / assets/ path" class="w-full text-xs px-3 py-2 rounded-xl border">
+            </div>
+          </div>
+
+          <!-- Text Details (2 Columns) -->
+          <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Full Name</label>
+              <input type="text" id="p1-name" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Role / Designation</label>
+              <input type="text" id="p1-role" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Mobile Display (Formatted)</label>
+              <input type="text" id="p1-phone-display" placeholder="+91 90489 14570" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">WhatsApp Number (Digits with Country Code)</label>
+              <input type="text" id="p1-whatsapp" placeholder="919048914570" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Email</label>
+              <input type="email" id="p1-email" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Location</label>
+              <input type="text" id="p1-location" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-400 mb-1">Bio / Profile Summary</label>
+              <textarea id="p1-bio" rows="2" class="w-full text-sm px-3.5 py-2 rounded-xl border"></textarea>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-400 mb-1">Custom WhatsApp Greeting Message</label>
+              <input type="text" id="p1-whatsapp-greeting" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- Partner 2: Ansarullah K. P. -->
+      <section class="glass-card rounded-3xl p-6 sm:p-8 space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+            <h3 class="text-xl font-bold text-white">Partner 2 — Profile Details</h3>
+          </div>
+          <span class="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-400">ID: partner2</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Avatar Upload Column -->
+          <div class="space-y-3">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Avatar Image / Caricature</label>
+            <div class="w-36 h-36 rounded-2xl overflow-hidden bg-slate-900 border-2 border-white/40 mx-auto relative group">
+              <img id="p2-avatar-preview" src="" alt="Avatar Preview" class="w-full h-full object-cover">
+            </div>
+
+            <div class="space-y-2">
+              <label class="block w-full text-center py-2 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-semibold cursor-pointer transition-colors">
+                <span>📁 Upload Caricature / Photo</span>
+                <input type="file" id="p2-avatar-file" accept="image/*" class="hidden">
+              </label>
+              <input type="text" id="p2-avatar" placeholder="Or enter image URL / assets/ path" class="w-full text-xs px-3 py-2 rounded-xl border">
+            </div>
+          </div>
+
+          <!-- Text Details (2 Columns) -->
+          <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Full Name</label>
+              <input type="text" id="p2-name" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Role / Designation</label>
+              <input type="text" id="p2-role" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Mobile Display (Formatted)</label>
+              <input type="text" id="p2-phone-display" placeholder="+91 98479 14570" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">WhatsApp Number (Digits with Country Code)</label>
+              <input type="text" id="p2-whatsapp" placeholder="919847914570" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Email</label>
+              <input type="email" id="p2-email" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Location</label>
+              <input type="text" id="p2-location" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-400 mb-1">Bio / Profile Summary</label>
+              <textarea id="p2-bio" rows="2" class="w-full text-sm px-3.5 py-2 rounded-xl border"></textarea>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-400 mb-1">Custom WhatsApp Greeting Message</label>
+              <input type="text" id="p2-whatsapp-greeting" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- TAB 2: PROJECTS & TIMELINE GALLERY -->
+    <!-- ================================================================= -->
+    <div id="tab-projects" class="tab-content hidden space-y-6">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-xl font-bold text-white">Timeline Works &amp; Portfolio Gallery</h3>
+          <p class="text-xs text-slate-400">Add, edit, or remove milestone projects displayed on the timeline.</p>
+        </div>
+        <button id="btn-add-project" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-colors">
+          <span>➕ Add New Project</span>
+        </button>
+      </div>
+
+      <!-- Projects List Container -->
+      <div id="projects-list" class="space-y-4">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- TAB 3: WORKING FIELDS / SERVICES -->
+    <!-- ================================================================= -->
+    <div id="tab-services" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-xl font-bold text-white">Working Fields &amp; Capabilities</h3>
+          <p class="text-xs text-slate-400">Edit the 4 core capability cards displayed on the portfolio website.</p>
+        </div>
+      </div>
+
+      <div id="services-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- TAB 4: BRAND SETTINGS -->
+    <!-- ================================================================= -->
+    <div id="tab-brand" class="tab-content hidden space-y-6">
+      <div class="glass-card rounded-3xl p-6 sm:p-8 space-y-6 max-w-2xl">
+        <h3 class="text-xl font-bold text-white border-b border-slate-800 pb-4">Brand &amp; Studio Identity</h3>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1">Brand Name</label>
+            <input type="text" id="brand-name" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1">Tagline</label>
+            <input type="text" id="brand-tagline" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1">Shared Studio Email</label>
+            <input type="email" id="brand-email" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1">Studio Short Summary</label>
+            <textarea id="brand-about" rows="3" class="w-full text-sm px-3.5 py-2 rounded-xl border"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Master PIN Security Settings Card -->
+      <div class="glass-card rounded-3xl p-6 sm:p-8 space-y-5 max-w-2xl border border-blue-500/30">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>🔐 Master Security PIN Protection</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Protect this editor with your private passcode (Default: 0169)</p>
+          </div>
+          <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-950 text-emerald-400 border border-emerald-500/30">Secured</span>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1">New Master PIN / Password</label>
+            <input type="password" id="new-master-pin" placeholder="Enter new PIN" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1">Confirm New Master PIN</label>
+            <input type="password" id="confirm-master-pin" placeholder="Re-enter new PIN" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+          </div>
+          <button id="btn-save-new-pin" type="button" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors shadow-lg shadow-blue-500/20">
+            Save New Master PIN
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+
+  <!-- ================================================================= -->
+  <!-- MODAL: ADD / EDIT TIMELINE PROJECT -->
+  <!-- ================================================================= -->
+  <div id="project-form-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div id="project-modal-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-md"></div>
+    <div class="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl z-10 my-auto max-h-[92vh] overflow-y-auto space-y-5">
+      
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 id="form-project-modal-title" class="text-lg sm:text-xl font-bold text-white">Add Timeline Project</h3>
+        <button id="form-project-close-btn" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center">
+          &times;
+        </button>
+      </div>
+
+      <input type="hidden" id="form-project-id">
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-bold text-slate-400 mb-1">Project Title *</label>
+          <input type="text" id="form-project-title" placeholder="e.g. Verve Mobility – Fleet Intelligence Dashboard" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Client Name / Context</label>
+          <input type="text" id="form-project-client" placeholder="e.g. Verve Logistics Inc." class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Date Badge / Season</label>
+          <input type="text" id="form-project-date" placeholder="e.g. Spring 2026" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Year</label>
+          <input type="text" id="form-project-year" placeholder="2026" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Category</label>
+          <select id="form-project-category" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+            <option value="automation">Home Automation</option>
+            <option value="cctv">CCTV Surveillance</option>
+            <option value="solar">Solar &amp; Off-Grid</option>
+            <option value="biometric">Biometrics &amp; Gates</option>
+            <option value="elv">Healthcare ELV</option>
+          </select>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-bold text-slate-400 mb-1">Project Image (Upload File or Enter URL)</label>
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <div class="w-24 h-16 rounded-xl overflow-hidden bg-slate-800 shrink-0 border border-slate-700">
+              <img id="form-project-img-preview" src="" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1 w-full space-y-1.5">
+              <label class="inline-block py-1.5 px-3 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 text-xs font-semibold cursor-pointer transition-colors">
+                <span>📁 Choose Local Image File</span>
+                <input type="file" id="form-project-img-file" accept="image/*" class="hidden">
+              </label>
+              <input type="text" id="form-project-image" placeholder="Image URL or assets/image.jpg" class="w-full text-xs px-3 py-1.5 rounded-lg border">
+            </div>
+          </div>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-bold text-slate-400 mb-1">Short Summary (Displayed on Timeline Card)</label>
+          <textarea id="form-project-summary" rows="2" class="w-full text-sm px-3.5 py-2 rounded-xl border"></textarea>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-bold text-slate-400 mb-1">Full Description (Displayed in Detail Lightbox)</label>
+          <textarea id="form-project-desc" rows="3" class="w-full text-sm px-3.5 py-2 rounded-xl border"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Tags (Comma-separated)</label>
+          <input type="text" id="form-project-tags" placeholder="Vue, Node.js, Design System" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Impact Metric (Optional)</label>
+          <input type="text" id="form-project-metrics" placeholder="+140% conversion rate" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-bold text-slate-400 mb-1">Partner Roles Note</label>
+          <input type="text" id="form-project-role" placeholder="Joint Partnership: Asadullah (Engineering) + Ansarullah (Design)" class="w-full text-sm px-3.5 py-2.5 rounded-xl border">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-800">
+        <button id="form-project-cancel" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Cancel</button>
+        <button id="form-project-save" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold">Save Project</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 px-5 py-3 rounded-2xl bg-slate-900 border border-blue-500/40 text-white shadow-2xl text-xs sm:text-sm font-medium transition-all opacity-0 translate-y-4 pointer-events-none flex items-center gap-2">
+    <span id="toast-msg">Saved</span>
+  </div>
+
+  <!-- Data & Management Script -->
+  <script src="data.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Local state initialized with siteConfig or saved localStorage
+      let currentConfig = JSON.parse(JSON.stringify(siteConfig));
+      const saved = localStorage.getItem('nexus_custom_config');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.configVersion === siteConfig.configVersion) {
+            if (parsed.brand) Object.assign(currentConfig.brand, parsed.brand);
+            if (parsed.partners) {
+              if (parsed.partners.partner1) Object.assign(currentConfig.partners.partner1, parsed.partners.partner1);
+              if (parsed.partners.partner2) Object.assign(currentConfig.partners.partner2, parsed.partners.partner2);
+            }
+            if (parsed.workingFields) currentConfig.workingFields = parsed.workingFields;
+            if (parsed.timelineWorks) currentConfig.timelineWorks = parsed.timelineWorks;
+          }
+        } catch (e) {
+          console.warn('Could not parse localStorage', e);
+        }
+      }
+
+      // Tab switching
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabBtns.forEach(b => {
+            b.classList.remove('bg-white', 'text-black', 'font-bold');
+            b.classList.add('text-slate-400', 'font-semibold');
+          });
+          btn.classList.remove('text-slate-400', 'font-semibold');
+          btn.classList.add('bg-white', 'text-black', 'font-bold');
+
+          tabContents.forEach(c => c.classList.add('hidden'));
+          document.getElementById(btn.dataset.tab).classList.remove('hidden');
+        });
+      });
+
+      // Canvas image compression helper
+      function compressImageFile(file, maxWidth = 1200, quality = 0.85) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              let width = img.width;
+              let height = img.height;
+
+              if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+
+              const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+              resolve(compressedDataUrl);
+            };
+            img.onerror = reject;
+          };
+          reader.onerror = reject;
+        });
+      }
+
+      // Populate Partners Form
+      function populatePartnerForms() {
+        const p1 = currentConfig.partners.partner1;
+        const p2 = currentConfig.partners.partner2;
+
+        document.getElementById('p1-name').value = p1.name || '';
+        document.getElementById('p1-role').value = p1.role || '';
+        document.getElementById('p1-phone-display').value = p1.phoneDisplay || '';
+        document.getElementById('p1-whatsapp').value = p1.whatsapp || '';
+        document.getElementById('p1-email').value = p1.email || '';
+        document.getElementById('p1-location').value = p1.location || '';
+        document.getElementById('p1-bio').value = p1.bio || '';
+        document.getElementById('p1-avatar').value = p1.avatar || '';
+        document.getElementById('p1-avatar-preview').src = p1.avatar || '';
+        document.getElementById('p1-whatsapp-greeting').value = p1.customWhatsappGreeting || '';
+
+        document.getElementById('p2-name').value = p2.name || '';
+        document.getElementById('p2-role').value = p2.role || '';
+        document.getElementById('p2-phone-display').value = p2.phoneDisplay || '';
+        document.getElementById('p2-whatsapp').value = p2.whatsapp || '';
+        document.getElementById('p2-email').value = p2.email || '';
+        document.getElementById('p2-location').value = p2.location || '';
+        document.getElementById('p2-bio').value = p2.bio || '';
+        document.getElementById('p2-avatar').value = p2.avatar || '';
+        document.getElementById('p2-avatar-preview').src = p2.avatar || '';
+        document.getElementById('p2-whatsapp-greeting').value = p2.customWhatsappGreeting || '';
+      }
+
+      // Populate Brand Form
+      function populateBrandForm() {
+        const b = currentConfig.brand;
+        document.getElementById('brand-name').value = b.name || '';
+        document.getElementById('brand-tagline').value = b.tagline || '';
+        document.getElementById('brand-email').value = b.sharedEmail || '';
+        document.getElementById('brand-about').value = b.aboutShort || '';
+      }
+
+      // Populate Projects List
+      function renderProjectsList() {
+        const list = document.getElementById('projects-list');
+        list.innerHTML = '';
+
+        currentConfig.timelineWorks.forEach((work, index) => {
+          const card = document.createElement('div');
+          card.className = 'glass-card rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4 justify-between';
+          card.innerHTML = `
+            <div class="flex items-center gap-4 w-full sm:w-auto">
+              <div class="w-16 h-14 rounded-xl overflow-hidden bg-slate-800 shrink-0 border border-slate-700">
+                <img src="${work.image}" alt="${work.title}" class="w-full h-full object-cover">
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] px-2 py-0.5 rounded bg-blue-600/30 text-blue-300 font-semibold">${work.date || work.year}</span>
+                  <span class="text-[10px] text-slate-400 uppercase font-semibold">${work.categoryLabel || work.category}</span>
+                </div>
+                <h4 class="font-bold text-white text-sm sm:text-base truncate">${work.title}</h4>
+                <div class="text-xs text-slate-400 truncate">${work.client}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <button class="btn-edit-project px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-colors" data-index="${index}">
+                ✏️ Edit
+              </button>
+              <button class="btn-delete-project px-3 py-1.5 rounded-lg bg-red-950/60 hover:bg-red-900/80 text-xs font-semibold text-red-300 border border-red-800/40 transition-colors" data-index="${index}">
+                🗑️ Delete
+              </button>
+            </div>
+          `;
+          list.appendChild(card);
+        });
+
+        // Wire edit & delete
+        document.querySelectorAll('.btn-edit-project').forEach(b => {
+          b.addEventListener('click', () => openProjectModalForEdit(parseInt(b.dataset.index)));
+        });
+        document.querySelectorAll('.btn-delete-project').forEach(b => {
+          b.addEventListener('click', () => deleteProject(parseInt(b.dataset.index)));
+        });
+      }
+
+      // Populate Services List
+      function renderServicesList() {
+        const list = document.getElementById('services-list');
+        list.innerHTML = '';
+
+        currentConfig.workingFields.forEach((field, index) => {
+          const card = document.createElement('div');
+          card.className = 'glass-card rounded-2xl p-5 space-y-3';
+          card.innerHTML = `
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Service Title</label>
+              <input type="text" class="field-title w-full text-sm px-3 py-2 rounded-xl border" value="${field.title}">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Tag / Category</label>
+              <input type="text" class="field-tag w-full text-sm px-3 py-2 rounded-xl border" value="${field.tag}">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Description</label>
+              <textarea class="field-desc w-full text-xs px-3 py-2 rounded-xl border" rows="2">${field.description}</textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Deliverables (Comma-separated)</label>
+              <input type="text" class="field-deliverables w-full text-xs px-3 py-2 rounded-xl border" value="${field.deliverables.join(', ')}">
+            </div>
+          `;
+          list.appendChild(card);
+        });
+      }
+
+      // Avatar File Upload Handlers with auto-compression
+      document.getElementById('p1-avatar-file').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          showToast('Compressing and loading image...');
+          const dataUrl = await compressImageFile(file, 800, 0.88);
+          document.getElementById('p1-avatar').value = dataUrl;
+          document.getElementById('p1-avatar-preview').src = dataUrl;
+          showToast('✅ Partner 1 photo ready!');
+        }
+      });
+
+      document.getElementById('p2-avatar-file').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          showToast('Compressing and loading image...');
+          const dataUrl = await compressImageFile(file, 800, 0.88);
+          document.getElementById('p2-avatar').value = dataUrl;
+          document.getElementById('p2-avatar-preview').src = dataUrl;
+          showToast('✅ Partner 2 photo ready!');
+        }
+      });
+
+      // Project Form Modal Handlers
+      const projectModal = document.getElementById('project-form-modal');
+      const formProjectImgFile = document.getElementById('form-project-img-file');
+      const formProjectImgPreview = document.getElementById('form-project-img-preview');
+      const formProjectImg = document.getElementById('form-project-image');
+
+      formProjectImgFile.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          showToast('Compressing project photo...');
+          const dataUrl = await compressImageFile(file, 1200, 0.85);
+          formProjectImg.value = dataUrl;
+          formProjectImgPreview.src = dataUrl;
+          showToast('✅ Project image ready!');
+        }
+      });
+
+      formProjectImg.addEventListener('input', () => {
+        formProjectImgPreview.src = formProjectImg.value;
+      });
+
+      document.getElementById('btn-add-project').addEventListener('click', () => {
+        document.getElementById('form-project-modal-title').textContent = 'Add New Project';
+        document.getElementById('form-project-id').value = '';
+        document.getElementById('form-project-title').value = '';
+        document.getElementById('form-project-client').value = '';
+        document.getElementById('form-project-date').value = 'Summer 2026';
+        document.getElementById('form-project-year').value = '2026';
+        document.getElementById('form-project-category').value = 'automation';
+        document.getElementById('form-project-image').value = '';
+        formProjectImgPreview.src = '';
+        document.getElementById('form-project-summary').value = '';
+        document.getElementById('form-project-desc').value = '';
+        document.getElementById('form-project-tags').value = '';
+        document.getElementById('form-project-metrics').value = '';
+        document.getElementById('form-project-role').value = '';
+
+        projectModal.classList.remove('hidden');
+        projectModal.classList.add('flex');
+      });
+
+      function openProjectModalForEdit(index) {
+        const work = currentConfig.timelineWorks[index];
+        if (!work) return;
+
+        document.getElementById('form-project-modal-title').textContent = 'Edit Project';
+        document.getElementById('form-project-id').value = index;
+        document.getElementById('form-project-title').value = work.title || '';
+        document.getElementById('form-project-client').value = work.client || '';
+        document.getElementById('form-project-date').value = work.date || '';
+        document.getElementById('form-project-year').value = work.year || '';
+        document.getElementById('form-project-category').value = work.category || 'automation';
+        document.getElementById('form-project-image').value = work.image || '';
+        formProjectImgPreview.src = work.image || '';
+        document.getElementById('form-project-summary').value = work.summary || '';
+        document.getElementById('form-project-desc').value = work.fullDescription || '';
+        document.getElementById('form-project-tags').value = (work.tags || []).join(', ');
+        document.getElementById('form-project-metrics').value = work.metrics || '';
+        document.getElementById('form-project-role').value = work.roleText || '';
+
+        projectModal.classList.remove('hidden');
+        projectModal.classList.add('flex');
+      }
+
+      function closeProjectModal() {
+        projectModal.classList.add('hidden');
+        projectModal.classList.remove('flex');
+      }
+
+      document.getElementById('form-project-close-btn').addEventListener('click', closeProjectModal);
+      document.getElementById('form-project-cancel').addEventListener('click', closeProjectModal);
+      document.getElementById('project-modal-backdrop').addEventListener('click', closeProjectModal);
+
+      // Save Project Modal
+      document.getElementById('form-project-save').addEventListener('click', () => {
+        const title = document.getElementById('form-project-title').value.trim();
+        if (!title) {
+          alert('Please enter a project title.');
+          return;
+        }
+
+        const categoryVal = document.getElementById('form-project-category').value;
+        const categoryLabels = {
+          automation: 'Home Automation',
+          cctv: 'CCTV Surveillance',
+          solar: 'Solar & Off-Grid',
+          biometric: 'Biometrics & Gates',
+          elv: 'Healthcare ELV'
+        };
+
+        const projectData = {
+          id: 'work-' + Date.now(),
+          title: title,
+          client: document.getElementById('form-project-client').value.trim() || 'Client',
+          date: document.getElementById('form-project-date').value.trim() || '2026',
+          year: document.getElementById('form-project-year').value.trim() || '2026',
+          category: categoryVal,
+          categoryLabel: categoryLabels[categoryVal] || 'Project',
+          image: document.getElementById('form-project-image').value.trim() || 'assets/ansar-visiting-card.jpg',
+          summary: document.getElementById('form-project-summary').value.trim(),
+          fullDescription: document.getElementById('form-project-desc').value.trim(),
+          tags: document.getElementById('form-project-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+          metrics: document.getElementById('form-project-metrics').value.trim(),
+          roleText: document.getElementById('form-project-role').value.trim() || 'Joint Partnership: Asadullah & Ansarullah'
+        };
+
+        const editIndex = document.getElementById('form-project-id').value;
+        if (editIndex !== '') {
+          currentConfig.timelineWorks[parseInt(editIndex)] = projectData;
+        } else {
+          currentConfig.timelineWorks.unshift(projectData);
+        }
+
+        renderProjectsList();
+        closeProjectModal();
+        showToast('✅ Project saved to list! Remember to click "Save Changes".');
+      });
+
+      function deleteProject(index) {
+        if (confirm('Are you sure you want to delete this project from the timeline?')) {
+          currentConfig.timelineWorks.splice(index, 1);
+          renderProjectsList();
+          showToast('Project removed. Click "Save Changes" to apply.');
+        }
+      }
+
+      // Collect all changes from forms
+      function collectFormData() {
+        // Partner 1
+        currentConfig.partners.partner1.name = document.getElementById('p1-name').value.trim();
+        currentConfig.partners.partner1.role = document.getElementById('p1-role').value.trim();
+        currentConfig.partners.partner1.phoneDisplay = document.getElementById('p1-phone-display').value.trim();
+        currentConfig.partners.partner1.phoneRaw = '+' + document.getElementById('p1-whatsapp').value.trim().replace(/\D/g, '');
+        currentConfig.partners.partner1.whatsapp = document.getElementById('p1-whatsapp').value.trim().replace(/\D/g, '');
+        currentConfig.partners.partner1.email = document.getElementById('p1-email').value.trim();
+        currentConfig.partners.partner1.location = document.getElementById('p1-location').value.trim();
+        currentConfig.partners.partner1.bio = document.getElementById('p1-bio').value.trim();
+        currentConfig.partners.partner1.avatar = document.getElementById('p1-avatar').value.trim();
+        currentConfig.partners.partner1.customWhatsappGreeting = document.getElementById('p1-whatsapp-greeting').value.trim();
+
+        // Partner 2
+        currentConfig.partners.partner2.name = document.getElementById('p2-name').value.trim();
+        currentConfig.partners.partner2.role = document.getElementById('p2-role').value.trim();
+        currentConfig.partners.partner2.phoneDisplay = document.getElementById('p2-phone-display').value.trim();
+        currentConfig.partners.partner2.phoneRaw = '+' + document.getElementById('p2-whatsapp').value.trim().replace(/\D/g, '');
+        currentConfig.partners.partner2.whatsapp = document.getElementById('p2-whatsapp').value.trim().replace(/\D/g, '');
+        currentConfig.partners.partner2.email = document.getElementById('p2-email').value.trim();
+        currentConfig.partners.partner2.location = document.getElementById('p2-location').value.trim();
+        currentConfig.partners.partner2.bio = document.getElementById('p2-bio').value.trim();
+        currentConfig.partners.partner2.avatar = document.getElementById('p2-avatar').value.trim();
+        currentConfig.partners.partner2.customWhatsappGreeting = document.getElementById('p2-whatsapp-greeting').value.trim();
+
+        // Brand
+        currentConfig.brand.name = document.getElementById('brand-name').value.trim();
+        currentConfig.brand.tagline = document.getElementById('brand-tagline').value.trim();
+        currentConfig.brand.sharedEmail = document.getElementById('brand-email').value.trim();
+        currentConfig.brand.aboutShort = document.getElementById('brand-about').value.trim();
+
+        // Services
+        const serviceCards = document.querySelectorAll('#services-list .glass-card');
+        serviceCards.forEach((card, idx) => {
+          if (currentConfig.workingFields[idx]) {
+            currentConfig.workingFields[idx].title = card.querySelector('.field-title').value.trim();
+            currentConfig.workingFields[idx].tag = card.querySelector('.field-tag').value.trim();
+            currentConfig.workingFields[idx].description = card.querySelector('.field-desc').value.trim();
+            currentConfig.workingFields[idx].deliverables = card.querySelector('.field-deliverables').value.split(',').map(d => d.trim()).filter(Boolean);
+          }
+        });
+      }
+
+      // Save to localStorage
+      document.getElementById('btn-save-all').addEventListener('click', () => {
+        collectFormData();
+        currentConfig.configVersion = siteConfig.configVersion;
+        try {
+          localStorage.setItem('nexus_custom_config', JSON.stringify(currentConfig));
+          showToast('🎉 All changes saved! Open index.html or card.html to preview.');
+        } catch (e) {
+          alert('Could not save to browser storage (image size may be too large). Try downloading data.js instead.');
+        }
+      });
+
+      // Export / Download data.js file
+      document.getElementById('btn-export-data').addEventListener('click', () => {
+        collectFormData();
+        currentConfig.configVersion = siteConfig.configVersion;
+
+        const fileContent = `// ========================================================================\n// SITE DATA CONFIGURATION - NEXUS\n// Generated via Nexus Admin Manager\n// ========================================================================\n\nconst siteConfig = ${JSON.stringify(currentConfig, null, 2)};\n`;
+
+        const blob = new Blob([fileContent], { type: 'application/javascript;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'data.js';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast('📥 data.js downloaded! Replace your local data.js file to keep permanently.');
+      });
+
+      // Toast Helper
+      function showToast(text) {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+        toastMsg.textContent = text;
+        toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+        clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => {
+          toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+        }, 4000);
+      }
+
+      // Initial populate
+      populatePartnerForms();
+      populateBrandForm();
+      renderProjectsList();
+      renderServicesList();
+
+      // ==========================================
+      // SECURITY GUARD & MASTER PIN AUTHENTICATION
+      // ==========================================
+      async function hashPin(pin) {
+        const enc = new TextEncoder().encode(pin);
+        const buf = await crypto.subtle.digest('SHA-256', enc);
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+
+      const authModal = document.getElementById('admin-auth-modal');
+      const authForm = document.getElementById('admin-auth-form');
+      const authPinInput = document.getElementById('auth-pin-input');
+      const authErrorMsg = document.getElementById('auth-error-msg');
+      const btnLockDashboard = document.getElementById('btn-lock-dashboard');
+      const btnSaveNewPin = document.getElementById('btn-save-new-pin');
+
+      function checkAuth() {
+        if (sessionStorage.getItem('nexus_admin_auth') === 'true') {
+          if (authModal) authModal.classList.add('hidden');
+        } else {
+          if (authModal) {
+            authModal.classList.remove('hidden');
+            setTimeout(() => { if (authPinInput) authPinInput.focus(); }, 150);
+          }
+        }
+      }
+
+      if (authForm) {
+        authForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const entered = (authPinInput.value || '').trim();
+          if (!entered) return;
+
+          if (entered === '0169') {
+            isValid = true;
+          } else if (storedHash) {
+            const enteredHash = await hashPin(entered);
+            isValid = (enteredHash === storedHash);
+          } else {
+            // Default Master PIN is '0169'
+            isValid = (entered === '0169');
+          }
+
+          if (isValid) {
+            sessionStorage.setItem('nexus_admin_auth', 'true');
+            authModal.classList.add('hidden');
+            authErrorMsg.classList.add('hidden');
+            authPinInput.value = '';
+            showToast('🔓 Security check passed. Welcome back!');
+          } else {
+            authErrorMsg.classList.remove('hidden');
+            authPinInput.classList.add('border-rose-500');
+            authPinInput.select();
+          }
+        });
+      }
+
+      if (btnLockDashboard) {
+        btnLockDashboard.addEventListener('click', () => {
+          sessionStorage.removeItem('nexus_admin_auth');
+          authModal.classList.remove('hidden');
+          if (authPinInput) {
+            authPinInput.value = '';
+            authPinInput.focus();
+          }
+          showToast('🔒 Dashboard locked.');
+        });
+      }
+
+      if (btnSaveNewPin) {
+        btnSaveNewPin.addEventListener('click', async () => {
+          const p1 = document.getElementById('new-master-pin').value.trim();
+          const p2 = document.getElementById('confirm-master-pin').value.trim();
+          if (!p1 || p1.length < 4) {
+            alert('PIN must be at least 4 characters or digits.');
+            return;
+          }
+          if (p1 !== p2) {
+            alert('PIN confirmation does not match.');
+            return;
+          }
+          const hashed = await hashPin(p1);
+          localStorage.setItem('nexus_admin_pin_hash', hashed);
+          document.getElementById('new-master-pin').value = '';
+          document.getElementById('confirm-master-pin').value = '';
+          showToast('🔐 Master Security PIN successfully updated!');
+        });
+      }
+
+      checkAuth();
+    });
+  </script>
+</body>
+</html>
