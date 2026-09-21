@@ -4,7 +4,7 @@
 // ========================================================================
 
 const siteConfig = {
-  configVersion: "2.0",
+  configVersion: "2.1",
 
   // Shared Studio / Brand Information
   brand: {
@@ -35,11 +35,12 @@ const siteConfig = {
       caricature: "assets/asad-caricature.jpg",
       pin: "0169",
       bio: "Specializing in enterprise IP surveillance architecture, smart building automation, and high-performance ELV solutions. Driving technical planning, seamless integrations, and reliable security deployment.",
-      customWhatsappGreeting: "Hi Asadullah! I was checking out your Nexus profile and would like to inquire about CCTV / Home Automation / ELV systems.",
+      customWhatsappGreeting: "Hi Asadullah\nI am ___ from ___",
       socials: {},
       vcard: {
         firstName: "Asadullah",
         lastName: "K. P.",
+        contactName: "Asadullah / CCTV, Home Automation",
         title: "Founder & Product Strategist",
         note: "Nexus Founder. Contact for CCTV surveillance, Home Automation, and ELV security systems."
       }
@@ -61,11 +62,12 @@ const siteConfig = {
       visitingCard: "assets/ansar-visiting-card.jpg",
       pin: "0169",
       bio: "Curating intuitive smart living environments, bespoke automation aesthetics, and high-standard client experiences. Blending technological security with refined architectural design.",
-      customWhatsappGreeting: "Hi Ansarullah! I was checking out your Nexus profile and would like to connect regarding CCTV / Home Automation / ELV solutions.",
+      customWhatsappGreeting: "Hi Ansarullah\nI am ___ from ___",
       socials: {},
       vcard: {
         firstName: "Ansarullah",
         lastName: "K. P.",
+        contactName: "Ansarullah / CCTV, Home Automation",
         title: "Founder & Creative Director",
         note: "Nexus Founder. Contact for smart home automation, security design, and ELV projects."
       }

@@ -227,19 +227,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const partner = siteConfig.partners[currentPartnerId];
     if (!partner) return;
 
+    // Contact name formatted specifically: e.g. "Asadullah / CCTV, Home Automation"
+    const contactName = partner.vcard?.contactName || `${partner.vcard?.firstName || partner.name} / CCTV, Home Automation`;
+
     // Build standard vCard 3.0 string compatible with iPhone & Android
     const vCardLines = [
       'BEGIN:VCARD',
       'VERSION:3.0',
-      `N:${partner.vcard.lastName || ''};${partner.vcard.firstName || partner.name};;;`,
-      `FN:${partner.name}`,
-      `ORG:${partner.company}`,
+      `FN:${contactName}`,
+      `N:;${contactName};;;`,
+      `ORG:${partner.company || 'Nexus'}`,
       `TITLE:${partner.role}`,
       `TEL;TYPE=CELL,VOICE,PREF:${partner.phoneRaw}`,
       `EMAIL;TYPE=INTERNET,WORK,PREF:${partner.email}`,
       `URL:${partner.website}`,
       `ADR;TYPE=WORK:;;;${partner.location};;;`,
-      `NOTE:${partner.vcard.note}`,
+      `NOTE:${partner.vcard?.note || 'Nexus Founder'}`,
       'END:VCARD'
     ];
 
@@ -249,13 +252,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const downloadLink = document.createElement('a');
     downloadLink.href = url;
-    downloadLink.download = `${partner.name.replace(/\s+/g, '_')}_Nexus.vcf`;
+    downloadLink.download = `${(partner.vcard?.firstName || partner.name).replace(/\s+/g, '_')}_CCTV_Home_Automation.vcf`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
     URL.revokeObjectURL(url);
 
-    showToast(`✅ Contact file for ${partner.name} downloaded! Tap it to save directly to your mobile contacts.`);
+    showToast(`✅ Contact saved as: "${contactName}"`);
   }
 
   // Share profile link
