@@ -114,10 +114,10 @@
     <!-- Left: Name Line 1 (capital), Name Line 2 (capital), Mobile  -->
     <!-- Right: Image of person in free space                         -->
     <!-- ============================================================ -->
-    <div id="print-card-wrapper" class="w-full max-w-[360px] aspect-[12/20] min-h-[600px] visiting-card-matte rounded-[32px] p-5 flex flex-col justify-between relative overflow-hidden select-none">
+    <div id="print-card-wrapper" class="w-full max-w-[360px] aspect-[12/17] min-h-[510px] visiting-card-matte rounded-[32px] p-5 flex flex-col justify-between relative overflow-hidden select-none">
       
       <!-- TOP SECTION: BIG AESTHETIC QR CODE -->
-      <div class="h-[55%] flex items-center justify-center relative pt-2">
+      <div class="h-[60%] flex items-center justify-center relative pt-1">
         <div id="card-qr-container" class="w-[230px] h-[230px] sm:w-[250px] sm:h-[250px] flex items-center justify-center bg-black">
           <!-- Inverted aesthetic white QR code injected here -->
         </div>
@@ -126,28 +126,30 @@
       <!-- Subtle Thin Divider Line -->
       <div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-1"></div>
 
-      <!-- BOTTOM SECTION: TEXT ON LEFT, IMAGE OF PERSON ON RIGHT -->
-      <div class="h-[43%] flex items-end justify-between relative">
+      <!-- BOTTOM SECTION: TEXT ON LEFT, IMAGE MATCHING HEIGHT ON RIGHT -->
+      <div class="h-[38%] flex items-stretch justify-between relative pt-1 pb-1">
         
         <!-- Left Side: Two-Line Capital Name + Mobile Number -->
-        <div class="flex-1 z-10 pb-3 pl-1 pr-2">
-          <!-- First Name (Strong Capital) -->
-          <div id="card-first-name" class="text-2xl sm:text-[28px] font-black text-white uppercase tracking-tight leading-none font-mono-brand">
-            ANSARULLAH
+        <div class="flex-1 z-10 flex flex-col justify-between pr-2">
+          <div>
+            <!-- First Name (Strong Capital) -->
+            <div id="card-first-name" class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight font-mono-brand">
+              ANSARULLAH
+            </div>
+            <!-- Second Line Strong Capital (e.g. K. P.) -->
+            <div id="card-last-name" class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight font-mono-brand mt-0.5">
+              K. P.
+            </div>
           </div>
-          <!-- Second Line Strong Capital (e.g. K. P.) -->
-          <div id="card-last-name" class="text-2xl sm:text-[28px] font-black text-white uppercase tracking-tight leading-none font-mono-brand mt-1.5">
-            K. P.
-          </div>
-          <!-- Mobile Number from left to almost 3/4 -->
-          <div id="card-phone" class="text-sm sm:text-base font-bold text-zinc-200 font-mono tracking-wider mt-4">
+          <!-- Mobile Number (Bottom aligned) -->
+          <div id="card-phone" class="text-xs sm:text-sm font-bold text-zinc-200 font-mono tracking-wider">
             +91 98479 14570
           </div>
         </div>
 
-        <!-- Right Side: Bust Portrait in Free Space (Anchored to bottom right) -->
-        <div class="w-[145px] sm:w-[165px] h-[180px] sm:h-[200px] shrink-0 absolute right-0 bottom-0 pointer-events-none flex items-end justify-end">
-          <img id="card-person-img" src="assets/ansar-lineart.jpg" alt="Portrait" class="w-full h-full object-contain object-bottom select-none">
+        <!-- Right Side: Bust Portrait in Free Space (Top aligns with Name, Bottom with Mobile) -->
+        <div class="w-[95px] sm:w-[110px] h-full shrink-0 pointer-events-none flex items-center justify-center">
+          <img id="card-person-img" src="assets/ansar-lineart.jpg" alt="Portrait" class="w-full h-full object-contain select-none">
         </div>
 
       </div>
@@ -401,7 +403,7 @@
 
         try {
           const W = 1200;
-          const H = 2000;
+          const H = 1680;
           const canvas = document.createElement('canvas');
           canvas.width = W;
           canvas.height = H;
@@ -422,31 +424,35 @@
           const baseUrl = window.location.href.split('#')[0].split('?')[0].replace('card.html', 'index.html');
           const cardUrl = `${baseUrl}?profile=${activePartner}`;
           const qrCanvas = generateQrCanvas(cardUrl, 900);
-          ctx.drawImage(qrCanvas, 150, 110, 900, 900);
+          ctx.drawImage(qrCanvas, 150, 90, 900, 900);
 
           // 4. Subtle Separator Line
           ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.moveTo(100, 1080);
-          ctx.lineTo(W - 100, 1080);
+          ctx.moveTo(90, 1050);
+          ctx.lineTo(W - 90, 1050);
           ctx.stroke();
 
-          // 5. Load and Draw Person's Bust Image (Bottom Right)
+          // 5. EXACT ALIGNMENT: Top of Name to Bottom of Mobile Number
+          const blockTop = 1140;
+          const blockBottom = 1510;
+          const blockHeight = blockBottom - blockTop; // 370 px
+
+          // Load and Draw Person's Bust Image (Right Side, Top = Name Top, Bottom = Mobile Bottom)
           const b64 = (typeof portraitLineartData !== 'undefined' && portraitLineartData[activePartner])
             ? portraitLineartData[activePartner]
             : (activePartner === 'partner1' ? 'assets/asad-lineart.jpg' : 'assets/ansar-lineart.jpg');
 
           const portraitImg = new Image();
           portraitImg.onload = () => {
-            const portW = 620;
-            const portH = 760;
-            const portX = W - portW - 40; // 540
-            const portY = H - portH - 40; // 1200
-            ctx.drawImage(portraitImg, portX, portY, portW, portH);
+            const imgSize = blockHeight; // 370 px
+            const imgX = W - imgSize - 90; // 740
+            const imgY = blockTop; // 1140
+            ctx.drawImage(portraitImg, imgX, imgY, imgSize, imgSize);
 
             // 6. BOTTOM LEFT: Text
-            const textX = 110;
+            const textX = 95;
             const nameParts = partner.name.trim().split(' ');
             const firstName = nameParts[0].toUpperCase();
             const lastName = nameParts.slice(1).join(' ').toUpperCase();
@@ -454,17 +460,17 @@
             // Line 1: First Name (strong capital)
             ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'left';
-            ctx.font = '900 68px "Space Grotesk", sans-serif';
-            ctx.fillText(firstName, textX, 1220);
+            ctx.font = '900 56px "Space Grotesk", sans-serif';
+            ctx.fillText(firstName, textX, blockTop + 55);
 
             // Line 2: Last Name on second line (strong capital)
-            ctx.font = '900 68px "Space Grotesk", sans-serif';
-            ctx.fillText(lastName, textX, 1340);
+            ctx.font = '900 56px "Space Grotesk", sans-serif';
+            ctx.fillText(lastName, textX, blockTop + 165);
 
-            // Line 3: Mobile Number from left to almost 3/4
+            // Line 3: Mobile Number (aligned with bottom of image)
             ctx.fillStyle = '#e2e8f0';
-            ctx.font = '700 48px monospace, "Space Grotesk", sans-serif';
-            ctx.fillText(partner.phoneDisplay, textX, 1500);
+            ctx.font = '700 44px monospace, "Space Grotesk", sans-serif';
+            ctx.fillText(partner.phoneDisplay, textX, blockBottom - 15);
 
             // 7. Trigger HQ Download
             canvas.toBlob((blob) => {
