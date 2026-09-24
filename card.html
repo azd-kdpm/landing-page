@@ -60,6 +60,8 @@
         transform: translate(-50%, -50%) !important;
         background: #000000 !important;
         box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
       }
       .no-print {
         display: none !important;
@@ -114,42 +116,39 @@
     <!-- Left: Name Line 1 (capital), Name Line 2 (capital), Mobile  -->
     <!-- Right: Image of person in free space                         -->
     <!-- ============================================================ -->
-    <div id="print-card-wrapper" class="w-full max-w-[360px] aspect-[12/17] min-h-[510px] visiting-card-matte rounded-[32px] p-5 flex flex-col justify-between relative overflow-hidden select-none">
+    <div id="print-card-wrapper" class="w-full max-w-[360px] aspect-[12/17] min-h-[510px] visiting-card-matte rounded-[32px] pt-4 px-4 sm:pt-5 sm:px-5 pb-0 flex flex-col justify-between relative overflow-hidden select-none">
       
       <!-- TOP SECTION: BIG AESTHETIC QR CODE -->
-      <div class="h-[60%] flex items-center justify-center relative pt-1">
-        <div id="card-qr-container" class="w-[230px] h-[230px] sm:w-[250px] sm:h-[250px] flex items-center justify-center bg-black">
+      <div class="h-[65%] flex items-center justify-center relative pt-1">
+        <div id="card-qr-container" class="w-[260px] h-[260px] sm:w-[285px] sm:h-[285px] flex items-center justify-center bg-black">
           <!-- Inverted aesthetic white QR code injected here -->
         </div>
       </div>
 
-      <!-- Subtle Thin Divider Line -->
-      <div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-1"></div>
-
-      <!-- BOTTOM SECTION: TEXT ON LEFT, IMAGE MATCHING HEIGHT ON RIGHT -->
-      <div class="h-[38%] flex items-stretch justify-between relative pt-1 pb-1">
+      <!-- BOTTOM SECTION: TEXT ON LEFT, BUST ON RIGHT (MATCHING EXACT SKETCH) -->
+      <div class="h-[35%] flex items-end justify-between relative">
         
-        <!-- Left Side: Two-Line Capital Name + Mobile Number -->
-        <div class="flex-1 z-10 flex flex-col justify-between pr-2">
+        <!-- Left Side: Two-Line Capital Name + 10-digit Mobile Number -->
+        <div class="flex-1 z-10 flex flex-col justify-between h-full pt-1 pb-4 sm:pb-5 pr-2">
           <div>
             <!-- First Name (Strong Capital) -->
-            <div id="card-first-name" class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight font-mono-brand">
+            <div id="card-first-name" class="text-2xl sm:text-[26px] font-black text-white uppercase tracking-tight leading-none font-mono-brand">
               ANSARULLAH
             </div>
             <!-- Second Line Strong Capital (e.g. K. P.) -->
-            <div id="card-last-name" class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight font-mono-brand mt-0.5">
+            <div id="card-last-name" class="text-2xl sm:text-[26px] font-black text-white uppercase tracking-tight leading-none font-mono-brand mt-1">
               K. P.
             </div>
           </div>
-          <!-- Mobile Number (Bottom aligned) -->
-          <div id="card-phone" class="text-xs sm:text-sm font-bold text-zinc-200 font-mono tracking-wider">
-            +91 98479 14570
+          <!-- 10-digit Mobile Number (Bottom aligned) -->
+          <div id="card-phone" class="text-base sm:text-lg font-bold text-white font-mono tracking-tight">
+            9847914570
           </div>
         </div>
 
-        <!-- Right Side: Bust Portrait in Free Space (Top aligns with Name, Bottom with Mobile) -->
-        <div class="w-[95px] sm:w-[110px] h-full shrink-0 pointer-events-none flex items-center justify-center">
-          <img id="card-person-img" src="assets/ansar-lineart.jpg" alt="Portrait" class="w-full h-full object-contain select-none">
+        <!-- Right Side: Bust Portrait flush to bottom right (Top aligns with Name) -->
+        <div class="w-[125px] sm:w-[145px] h-full shrink-0 pointer-events-none flex items-end justify-end">
+          <img id="card-person-img" src="assets/ansar-lineart.jpg" alt="Portrait" class="w-full h-auto max-h-full object-contain object-bottom select-none">
         </div>
 
       </div>
@@ -357,7 +356,8 @@
 
         cardFirstName.textContent = firstName;
         cardLastName.textContent = lastName;
-        cardPhone.textContent = partner.phoneDisplay;
+        const cleanPhone = (partner.whatsapp ? partner.whatsapp.replace(/^91/, '') : partner.phoneRaw.replace(/^\+91/, '')).replace(/\s+/g, '');
+        cardPhone.textContent = cleanPhone;
 
         // Image of person (Line Art bust)
         const b64 = (typeof portraitLineartData !== 'undefined' && portraitLineartData[partnerId])
@@ -370,7 +370,7 @@
         cardQrContainer.innerHTML = '';
         const baseUrl = window.location.href.split('#')[0].split('?')[0].replace('card.html', 'index.html');
         const cardUrl = `${baseUrl}?profile=${partnerId}`;
-        const qrCanvas = generateQrCanvas(cardUrl, 480);
+        const qrCanvas = generateQrCanvas(cardUrl, 560);
         qrCanvas.className = 'w-full h-full object-contain';
         cardQrContainer.appendChild(qrCanvas);
 
@@ -391,15 +391,39 @@
 
       // ============================================================
       // 300 DPI HQ PRINT CARD DOWNLOAD ENGINE (PURE #000000 BLACK)
-      // Exact User Red-Sketch Layout:
-      // Top ~60%: Big aesthetic QR Code
-      // Bottom Left: Name line 1 (capital), Name line 2 (capital), Mobile
-      // Bottom Right: Line-art bust of person
+      // Exact User Specification & Reference:
+      // Top ~65%: Big aesthetic QR Code (1100x1100)
+      // Bottom Left: Name line 1 (capital), Name line 2 (capital), 10-digit Mobile
+      // Bottom Right: Line-art bust of person flush to bottom-right
+      // Pure solid #000000 black, no borders, no separator lines.
       // ============================================================
       btnDownloadCard.addEventListener('click', async () => {
-        showToast('Generating 300 DPI Card...');
+        showToast('Preparing 300 DPI Card...');
         const partner = siteConfig.partners[activePartner];
-        const filename = `Nexus_VisitingCard_${partner.name.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+        const isPartner1 = activePartner === 'partner1';
+        const filename = isPartner1 ? 'Nexus_VisitingCard_Asadullah.png' : 'Nexus_VisitingCard_Ansarullah.png';
+        const preRenderedUrl = `assets/${filename}`;
+
+        // Attempt direct download of pre-rendered 300 DPI master card first
+        try {
+          const res = await fetch(preRenderedUrl, { method: 'HEAD' });
+          if (res.ok) {
+            const a = document.createElement('a');
+            a.href = preRenderedUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => document.body.removeChild(a), 2000);
+
+            modalCardPreview.src = preRenderedUrl;
+            modalDownloadLink.href = preRenderedUrl;
+            modalDownloadLink.download = filename;
+            showToast('✅ Visiting card downloaded!');
+            return;
+          }
+        } catch (e) {
+          // If fetch fails (e.g. file:/// restrictions), fallback to offline canvas rendering below
+        }
 
         try {
           const W = 1200;
@@ -409,70 +433,54 @@
           canvas.height = H;
           const ctx = canvas.getContext('2d');
 
-          // 1. Pure #000000 Black Background
+          // 1. Pure #000000 Black Background (No card border stroke)
           ctx.fillStyle = '#000000';
           ctx.fillRect(0, 0, W, H);
 
-          // 2. Rounded Outer Card Border
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-          ctx.lineWidth = 3;
-          ctx.beginPath();
-          drawRoundedRect(ctx, 40, 40, W - 80, H - 80, 50);
-          ctx.stroke();
-
-          // 3. TOP SECTION: Big QR Code (900x900)
+          // 2. TOP SECTION: Huge QR Code (1100x1100) centered at X=50, Y=50 (No divider line)
           const baseUrl = window.location.href.split('#')[0].split('?')[0].replace('card.html', 'index.html');
           const cardUrl = `${baseUrl}?profile=${activePartner}`;
-          const qrCanvas = generateQrCanvas(cardUrl, 900);
-          ctx.drawImage(qrCanvas, 150, 90, 900, 900);
+          const qrCanvas = generateQrCanvas(cardUrl, 1100);
+          ctx.drawImage(qrCanvas, 50, 50, 1100, 1100);
 
-          // 4. Subtle Separator Line
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(90, 1050);
-          ctx.lineTo(W - 90, 1050);
-          ctx.stroke();
+          // 3. BOTTOM SECTION: Starts at Y=1180
+          const bottomTop = 1180;
+          const portW = 460;
+          const portH = 500;
+          const portX = W - portW; // 740, flush right
+          const portY = H - portH; // 1180, flush bottom
 
-          // 5. EXACT ALIGNMENT: Top of Name to Bottom of Mobile Number
-          const blockTop = 1140;
-          const blockBottom = 1510;
-          const blockHeight = blockBottom - blockTop; // 370 px
-
-          // Load and Draw Person's Bust Image (Right Side, Top = Name Top, Bottom = Mobile Bottom)
           const b64 = (typeof portraitLineartData !== 'undefined' && portraitLineartData[activePartner])
             ? portraitLineartData[activePartner]
             : (activePartner === 'partner1' ? 'assets/asad-lineart.jpg' : 'assets/ansar-lineart.jpg');
 
           const portraitImg = new Image();
           portraitImg.onload = () => {
-            const imgSize = blockHeight; // 370 px
-            const imgX = W - imgSize - 90; // 740
-            const imgY = blockTop; // 1140
-            ctx.drawImage(portraitImg, imgX, imgY, imgSize, imgSize);
+            // Draw bust flush at bottom right
+            ctx.drawImage(portraitImg, portX, portY, portW, portH);
 
-            // 6. BOTTOM LEFT: Text
-            const textX = 95;
+            // Left side text: Top aligns with top of hair (Y=1180)
+            const textX = 70;
             const nameParts = partner.name.trim().split(' ');
             const firstName = nameParts[0].toUpperCase();
             const lastName = nameParts.slice(1).join(' ').toUpperCase();
+            const cleanPhone = (partner.whatsapp ? partner.whatsapp.replace(/^91/, '') : partner.phoneRaw.replace(/^\+91/, '')).replace(/\s+/g, '');
 
-            // Line 1: First Name (strong capital)
+            // Line 1: First Name (strong bold capital)
             ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'left';
-            ctx.font = '900 56px "Space Grotesk", sans-serif';
-            ctx.fillText(firstName, textX, blockTop + 55);
+            ctx.font = 'bold 74px Arial, "Space Grotesk", sans-serif';
+            ctx.fillText(firstName, textX, bottomTop + 75);
 
-            // Line 2: Last Name on second line (strong capital)
-            ctx.font = '900 56px "Space Grotesk", sans-serif';
-            ctx.fillText(lastName, textX, blockTop + 165);
+            // Line 2: Last Name on second line (strong bold capital)
+            ctx.font = 'bold 74px Arial, "Space Grotesk", sans-serif';
+            ctx.fillText(lastName, textX, bottomTop + 170);
 
-            // Line 3: Mobile Number (aligned with bottom of image)
-            ctx.fillStyle = '#e2e8f0';
-            ctx.font = '700 44px monospace, "Space Grotesk", sans-serif';
-            ctx.fillText(partner.phoneDisplay, textX, blockBottom - 15);
+            // Line 3: 10-digit mobile number
+            ctx.font = 'bold 62px Arial, monospace, sans-serif';
+            ctx.fillText(cleanPhone, textX, bottomTop + 335);
 
-            // 7. Trigger HQ Download
+            // 4. Trigger HQ Download
             canvas.toBlob((blob) => {
               if (blob) {
                 const url = URL.createObjectURL(blob);
