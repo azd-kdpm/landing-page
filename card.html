@@ -13,6 +13,9 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Local QR Code Engine (100% Offline Capable) -->
+  <script src="assets/qrcode.min.js"></script>
+
   <!-- Embedded Base64 Portrait Line Art (100% Offline & File:/// Safe - Zero Canvas Tainting) -->
   <script src="assets/portraits_data.js"></script>
 
@@ -31,8 +34,8 @@
     /* Card Luxury Matte Black Finish on Display */
     .visiting-card-matte {
       background: #000000;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.05);
     }
 
     /* Print Specific Styling: Pure #000000 Black */
@@ -69,8 +72,8 @@
   <!-- Subtle Ambient Glow -->
   <div class="fixed top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-white/[0.03] rounded-full blur-3xl pointer-events-none"></div>
 
-  <!-- Top Navigation & Mode Switcher -->
-  <header class="w-full max-w-xl mx-auto px-4 pt-6 flex items-center justify-between no-print">
+  <!-- Top Navigation & Partner Switcher -->
+  <header class="w-full max-w-md mx-auto px-4 pt-6 flex items-center justify-between no-print">
     <!-- Brand Return to Main Website -->
     <a href="index.html" class="flex items-center gap-2 group" title="Return to Main Portfolio">
       <div class="w-8 h-8 rounded-xl bg-white text-black font-extrabold flex items-center justify-center font-mono-brand text-sm shadow group-hover:scale-105 transition-transform">
@@ -82,93 +85,71 @@
       </div>
     </a>
 
-    <!-- Card Selector: Both (Duo) / Ansarullah / Asadullah -->
+    <!-- Founder Toggle: Ansarullah / Asadullah -->
     <div class="flex items-center gap-1 p-1 bg-zinc-900/90 border border-zinc-800 rounded-xl">
-      <button id="btn-switch-duo" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-black shadow-sm" data-mode="duo">
-        Both (Duo)
-      </button>
-      <button id="btn-switch-ansar" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-400 hover:text-white" data-mode="partner2">
+      <button id="btn-switch-ansar" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-black shadow-sm" data-partner="partner2">
         Ansarullah
       </button>
-      <button id="btn-switch-asad" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-400 hover:text-white" data-mode="partner1">
+      <button id="btn-switch-asad" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-400 hover:text-white" data-partner="partner1">
         Asadullah
       </button>
     </div>
   </header>
 
   <!-- Main Card Display Showcase -->
-  <main class="w-full max-w-3xl mx-auto px-4 py-6 flex flex-col items-center">
+  <main class="w-full max-w-md mx-auto px-4 py-6 flex flex-col items-center">
 
     <!-- Notice -->
-    <div class="text-center mb-5 no-print">
+    <div class="text-center mb-4 no-print">
       <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900/90 border border-zinc-800 text-[11px] font-medium text-zinc-400">
         <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-        <span>Name &amp; Number Only &bull; Dark Line-Art Edition</span>
+        <span>Aesthetic QR &bull; Two-Line Capital Name &bull; Line-Art Bust</span>
       </span>
     </div>
 
     <!-- ============================================================ -->
     <!-- VISITING CARD CONTAINER (Exact User Specification)          -->
-    <!-- Name and number only with images of us                      -->
+    <!-- Top 55-60%: Big aesthetic QR Code                           -->
+    <!-- Bottom:                                                      -->
+    <!-- Left: Name Line 1 (capital), Name Line 2 (capital), Mobile  -->
+    <!-- Right: Image of person in free space                         -->
     <!-- ============================================================ -->
-    <div id="print-card-wrapper" class="w-full transition-all duration-300 flex items-center justify-center select-none">
+    <div id="print-card-wrapper" class="w-full max-w-[360px] aspect-[12/20] min-h-[600px] visiting-card-matte rounded-[32px] p-5 flex flex-col justify-between relative overflow-hidden select-none">
       
-      <!-- 1. DUO CARD VIEW (Both Partners Side-by-Side) -->
-      <div id="card-view-duo" class="w-full max-w-[700px] visiting-card-matte rounded-[28px] sm:rounded-[36px] p-5 sm:p-7 relative overflow-hidden">
-        <div class="grid grid-cols-2 gap-4 sm:gap-6 relative">
-          
-          <!-- Subtle Vertical Divider -->
-          <div class="absolute left-1/2 top-4 bottom-4 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
-
-          <!-- Left Column: Ansarullah K. P. -->
-          <div class="flex flex-col items-center text-center">
-            <div class="w-full aspect-square rounded-2xl overflow-hidden mb-3 sm:mb-4 bg-black">
-              <img id="duo-img-ansar" src="assets/ansar-lineart.jpg" alt="Ansarullah K. P." class="w-full h-full object-contain pointer-events-none">
-            </div>
-            <!-- Accent divider line -->
-            <div class="w-24 sm:w-36 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent mb-3"></div>
-            <div class="text-sm sm:text-lg font-black text-white uppercase tracking-tight leading-tight font-mono-brand">
-              ANSARULLAH<br>K. P.
-            </div>
-            <div class="text-xs sm:text-sm font-bold text-zinc-300 font-mono tracking-wider mt-1.5">
-              +91 98479 14570
-            </div>
-          </div>
-
-          <!-- Right Column: Asadullah K. P. -->
-          <div class="flex flex-col items-center text-center">
-            <div class="w-full aspect-square rounded-2xl overflow-hidden mb-3 sm:mb-4 bg-black">
-              <img id="duo-img-asad" src="assets/asad-lineart.jpg" alt="Asadullah K. P." class="w-full h-full object-contain pointer-events-none">
-            </div>
-            <!-- Accent divider line -->
-            <div class="w-24 sm:w-36 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent mb-3"></div>
-            <div class="text-sm sm:text-lg font-black text-white uppercase tracking-tight leading-tight font-mono-brand">
-              ASADULLAH<br>K. P.
-            </div>
-            <div class="text-xs sm:text-sm font-bold text-zinc-300 font-mono tracking-wider mt-1.5">
-              +91 90489 14570
-            </div>
-          </div>
-
+      <!-- TOP SECTION: BIG AESTHETIC QR CODE -->
+      <div class="h-[55%] flex items-center justify-center relative pt-2">
+        <div id="card-qr-container" class="w-[230px] h-[230px] sm:w-[250px] sm:h-[250px] flex items-center justify-center bg-black">
+          <!-- Inverted aesthetic white QR code injected here -->
         </div>
       </div>
 
-      <!-- 2. INDIVIDUAL CARD VIEW (Single Partner Portrait) -->
-      <div id="card-view-individual" class="w-full max-w-[360px] visiting-card-matte rounded-[32px] p-6 relative overflow-hidden hidden flex-col items-center text-center">
-        <!-- Portrait Image -->
-        <div class="w-full aspect-square rounded-2xl overflow-hidden mb-5 bg-black">
-          <img id="individual-img" src="assets/ansar-lineart.jpg" alt="Portrait" class="w-full h-full object-contain pointer-events-none">
+      <!-- Subtle Thin Divider Line -->
+      <div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-1"></div>
+
+      <!-- BOTTOM SECTION: TEXT ON LEFT, IMAGE OF PERSON ON RIGHT -->
+      <div class="h-[43%] flex items-end justify-between relative">
+        
+        <!-- Left Side: Two-Line Capital Name + Mobile Number -->
+        <div class="flex-1 z-10 pb-3 pl-1 pr-2">
+          <!-- First Name (Strong Capital) -->
+          <div id="card-first-name" class="text-2xl sm:text-[28px] font-black text-white uppercase tracking-tight leading-none font-mono-brand">
+            ANSARULLAH
+          </div>
+          <!-- Second Line Strong Capital (e.g. K. P.) -->
+          <div id="card-last-name" class="text-2xl sm:text-[28px] font-black text-white uppercase tracking-tight leading-none font-mono-brand mt-1.5">
+            K. P.
+          </div>
+          <!-- Mobile Number from left to almost 3/4 -->
+          <div id="card-phone" class="text-sm sm:text-base font-bold text-zinc-200 font-mono tracking-wider mt-4">
+            +91 98479 14570
+          </div>
         </div>
-        <!-- Accent Line -->
-        <div class="w-40 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent mb-4"></div>
-        <!-- Name -->
-        <div id="individual-name" class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight font-mono-brand">
-          ANSARULLAH<br>K. P.
+
+        <!-- Right Side: Bust Portrait in Free Space (Anchored to bottom right) -->
+        <div class="w-[145px] sm:w-[165px] h-[180px] sm:h-[200px] shrink-0 absolute right-0 bottom-0 pointer-events-none flex items-end justify-end">
+          <img id="card-person-img" src="assets/ansar-lineart.jpg" alt="Portrait" class="w-full h-full object-contain object-bottom select-none">
         </div>
-        <!-- Phone Number -->
-        <div id="individual-phone" class="text-base sm:text-lg font-bold text-zinc-300 font-mono tracking-wider mt-2">
-          +91 98479 14570
-        </div>
+
       </div>
 
     </div>
@@ -176,12 +157,12 @@
     <!-- ============================================================ -->
     <!-- DOWNLOAD & PRINT ACTIONS                                     -->
     <!-- ============================================================ -->
-    <div class="w-full max-w-sm sm:max-w-md mt-6 space-y-3 no-print">
+    <div class="w-full max-w-[360px] mt-6 space-y-3 no-print">
       
       <!-- Download HQ PNG (Pure #000000 Black, 300 DPI) -->
       <button id="btn-download-card" class="w-full py-4 px-4 rounded-2xl bg-white text-black hover:bg-zinc-200 active:scale-95 font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl shadow-white/5 transition-all">
         <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-        <span id="download-btn-text">Download Duo Card (HQ PNG)</span>
+        <span id="download-btn-text">Download Card (HQ 300 DPI PNG)</span>
       </button>
 
       <!-- Print Card -->
@@ -231,15 +212,14 @@
   <script src="data.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      let currentMode = 'duo'; // 'duo', 'partner1', 'partner2'
+      let activePartner = 'partner2'; // Default: Ansarullah K. P.
 
       // DOM references
-      const cardViewDuo = document.getElementById('card-view-duo');
-      const cardViewIndividual = document.getElementById('card-view-individual');
-      const individualImg = document.getElementById('individual-img');
-      const individualName = document.getElementById('individual-name');
-      const individualPhone = document.getElementById('individual-phone');
-      const btnSwitchDuo = document.getElementById('btn-switch-duo');
+      const cardFirstName = document.getElementById('card-first-name');
+      const cardLastName = document.getElementById('card-last-name');
+      const cardPhone = document.getElementById('card-phone');
+      const cardPersonImg = document.getElementById('card-person-img');
+      const cardQrContainer = document.getElementById('card-qr-container');
       const btnSwitchAnsar = document.getElementById('btn-switch-ansar');
       const btnSwitchAsad = document.getElementById('btn-switch-asad');
       const btnDownloadCard = document.getElementById('btn-download-card');
@@ -253,11 +233,9 @@
 
       // Check URL query param e.g. ?profile=partner1 or ?profile=partner2
       const urlParams = new URLSearchParams(window.location.search);
-      const paramP = urlParams.get('profile') || urlParams.get('p') || urlParams.get('mode');
+      const paramP = urlParams.get('profile') || urlParams.get('p') || urlParams.get('user');
       if (paramP === 'partner1' || paramP === 'asad') {
-        currentMode = 'partner1';
-      } else if (paramP === 'partner2' || paramP === 'ansar') {
-        currentMode = 'partner2';
+        activePartner = 'partner1';
       }
 
       function showToast(msg) {
@@ -276,56 +254,14 @@
         });
       }
 
-      // Switch view mode
-      function setMode(mode) {
-        currentMode = mode;
-
-        // Reset button styles
-        const activeBtnClass = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-black shadow-sm';
-        const inactiveBtnClass = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-400 hover:text-white';
-
-        btnSwitchDuo.className = mode === 'duo' ? activeBtnClass : inactiveBtnClass;
-        btnSwitchAnsar.className = mode === 'partner2' ? activeBtnClass : inactiveBtnClass;
-        btnSwitchAsad.className = mode === 'partner1' ? activeBtnClass : inactiveBtnClass;
-
-        if (mode === 'duo') {
-          cardViewDuo.classList.remove('hidden');
-          cardViewIndividual.classList.add('hidden');
-          cardViewIndividual.classList.remove('flex');
-          downloadBtnText.textContent = 'Download Duo Card (HQ PNG)';
-        } else {
-          cardViewDuo.classList.add('hidden');
-          cardViewIndividual.classList.remove('hidden');
-          cardViewIndividual.classList.add('flex');
-
-          const partner = siteConfig.partners[mode];
-          const imgB64 = (typeof portraitLineartData !== 'undefined' && portraitLineartData[mode]) 
-            ? portraitLineartData[mode]
-            : (mode === 'partner1' ? 'assets/asad-lineart.jpg' : 'assets/ansar-lineart.jpg');
-
-          individualImg.src = imgB64;
-          individualImg.alt = partner.name;
-
-          const nameParts = partner.name.trim().split(' ');
-          let nameHtml = partner.name.toUpperCase();
-          if (nameParts.length >= 2) {
-            const firstPart = nameParts.slice(0, -2).join(' ') || nameParts[0];
-            const lastPart = nameParts.slice(-2).join(' ');
-            nameHtml = `${firstPart.toUpperCase()}<br>${lastPart.toUpperCase()}`;
-          }
-          individualName.innerHTML = nameHtml;
-          individualPhone.textContent = partner.phoneDisplay;
-
-          downloadBtnText.textContent = `Download ${partner.name.split(' ')[0]}'s Card (HQ PNG)`;
+      // Rounded rect helper for Canvas
+      function drawRoundedRect(ctx, x, y, w, h, r) {
+        if (r <= 0) {
+          ctx.beginPath();
+          ctx.rect(x, y, w, h);
+          ctx.fill();
+          return;
         }
-      }
-
-      btnSwitchDuo.addEventListener('click', () => setMode('duo'));
-      btnSwitchAnsar.addEventListener('click', () => setMode('partner2'));
-      btnSwitchAsad.addEventListener('click', () => setMode('partner1'));
-
-      // Helper for rounded rectangle in Canvas
-      function drawRoundedRect(ctx, x, y, w, h, r, fill, stroke) {
         ctx.beginPath();
         ctx.moveTo(x + r, y);
         ctx.lineTo(x + w - r, y);
@@ -337,136 +273,234 @@
         ctx.lineTo(x, y + r);
         ctx.quadraticCurveTo(x, y, x + r, y);
         ctx.closePath();
-        if (fill) ctx.fill();
-        if (stroke) ctx.stroke();
+        ctx.fill();
       }
 
-      function loadImage(src) {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => resolve(img);
-          img.onerror = reject;
-          img.src = src;
+      // Generate local aesthetic QR code on Canvas
+      function generateQrCanvas(url, targetSize) {
+        const tempDiv = document.createElement('div');
+        const qrObj = new QRCode(tempDiv, {
+          text: url,
+          correctLevel: QRCode.CorrectLevel.H
         });
+        const qrModel = qrObj._oQRCode;
+        const count = qrModel.getModuleCount();
+
+        const canvas = document.createElement('canvas');
+        canvas.width = targetSize;
+        canvas.height = targetSize;
+        const ctx = canvas.getContext('2d');
+
+        const cellSize = targetSize / count;
+
+        function isFinder(r, c) {
+          return (r < 7 && c < 7) ||
+                 (r < 7 && c >= count - 7) ||
+                 (r >= count - 7 && c < 7);
+        }
+
+        function drawFinder(row, col) {
+          const fx = col * cellSize;
+          const fy = row * cellSize;
+          const fw = 7 * cellSize;
+          const outerR = cellSize * 2.2;
+
+          ctx.fillStyle = '#ffffff';
+          drawRoundedRect(ctx, fx, fy, fw, fw, outerR);
+
+          const gap1 = 1 * cellSize;
+          const w1 = 5 * cellSize;
+          const innerR = cellSize * 1.5;
+          ctx.fillStyle = '#000000';
+          drawRoundedRect(ctx, fx + gap1, fy + gap1, w1, w1, innerR);
+
+          const gap2 = 2 * cellSize;
+          const w2 = 3 * cellSize;
+          const pupilR = cellSize * 1.1;
+          ctx.fillStyle = '#ffffff';
+          drawRoundedRect(ctx, fx + gap2, fy + gap2, w2, w2, pupilR);
+        }
+
+        drawFinder(0, 0);
+        drawFinder(0, count - 7);
+        drawFinder(count - 7, 0);
+
+        ctx.fillStyle = '#ffffff';
+        const modR = cellSize * 0.35;
+        for (let r = 0; r < count; r++) {
+          for (let c = 0; c < count; c++) {
+            if (isFinder(r, c)) continue;
+            if (qrModel.isDark(r, c)) {
+              const mx = c * cellSize;
+              const my = r * cellSize;
+              const inset = cellSize * 0.05;
+              drawRoundedRect(ctx, mx + inset, my + inset, cellSize - inset * 2, cellSize - inset * 2, modR);
+            }
+          }
+        }
+
+        return canvas;
       }
+
+      // Render the Visiting Card on Screen
+      function renderCard(partnerId) {
+        activePartner = partnerId;
+        const partner = siteConfig.partners[partnerId];
+        if (!partner) return;
+
+        // Split name into First Name and Last Name (e.g. ASADULLAH \n K. P.)
+        const nameParts = partner.name.trim().split(' ');
+        let firstName = nameParts[0].toUpperCase();
+        let lastName = nameParts.slice(1).join(' ').toUpperCase();
+
+        cardFirstName.textContent = firstName;
+        cardLastName.textContent = lastName;
+        cardPhone.textContent = partner.phoneDisplay;
+
+        // Image of person (Line Art bust)
+        const b64 = (typeof portraitLineartData !== 'undefined' && portraitLineartData[partnerId])
+          ? portraitLineartData[partnerId]
+          : (partnerId === 'partner1' ? 'assets/asad-lineart.jpg' : 'assets/ansar-lineart.jpg');
+        cardPersonImg.src = b64;
+        cardPersonImg.alt = partner.name;
+
+        // Generate and inject QR Code on Screen
+        cardQrContainer.innerHTML = '';
+        const baseUrl = window.location.href.split('#')[0].split('?')[0].replace('card.html', 'index.html');
+        const cardUrl = `${baseUrl}?profile=${partnerId}`;
+        const qrCanvas = generateQrCanvas(cardUrl, 480);
+        qrCanvas.className = 'w-full h-full object-contain';
+        cardQrContainer.appendChild(qrCanvas);
+
+        // Update Toggle Switchers
+        if (partnerId === 'partner2') {
+          btnSwitchAnsar.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-black shadow-sm';
+          btnSwitchAsad.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-400 hover:text-white';
+          downloadBtnText.textContent = "Download Ansarullah's Card (HQ PNG)";
+        } else {
+          btnSwitchAsad.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-black shadow-sm';
+          btnSwitchAnsar.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-zinc-400 hover:text-white';
+          downloadBtnText.textContent = "Download Asadullah's Card (HQ PNG)";
+        }
+      }
+
+      btnSwitchAnsar.addEventListener('click', () => renderCard('partner2'));
+      btnSwitchAsad.addEventListener('click', () => renderCard('partner1'));
 
       // ============================================================
       // 300 DPI HQ PRINT CARD DOWNLOAD ENGINE (PURE #000000 BLACK)
-      // Name & Number Only with Images of Us
+      // Exact User Red-Sketch Layout:
+      // Top ~60%: Big aesthetic QR Code
+      // Bottom Left: Name line 1 (capital), Name line 2 (capital), Mobile
+      // Bottom Right: Line-art bust of person
       // ============================================================
       btnDownloadCard.addEventListener('click', async () => {
         showToast('Generating 300 DPI Card...');
+        const partner = siteConfig.partners[activePartner];
+        const filename = `Nexus_VisitingCard_${partner.name.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
 
         try {
+          const W = 1200;
+          const H = 2000;
           const canvas = document.createElement('canvas');
+          canvas.width = W;
+          canvas.height = H;
+          const ctx = canvas.getContext('2d');
 
-          if (currentMode === 'duo') {
-            // DUO CARD: 2200 x 1400 px
-            canvas.width = 2200;
-            canvas.height = 1400;
-            const ctx = canvas.getContext('2d');
+          // 1. Pure #000000 Black Background
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(0, 0, W, H);
 
-            // 1. Pure #000000 Black Background
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(0, 0, 2200, 1400);
+          // 2. Rounded Outer Card Border
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          drawRoundedRect(ctx, 40, 40, W - 80, H - 80, 50);
+          ctx.stroke();
 
-            // 2. Rounded Border
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-            ctx.lineWidth = 3;
-            drawRoundedRect(ctx, 40, 40, 2120, 1320, 50, false, true);
+          // 3. TOP SECTION: Big QR Code (900x900)
+          const baseUrl = window.location.href.split('#')[0].split('?')[0].replace('card.html', 'index.html');
+          const cardUrl = `${baseUrl}?profile=${activePartner}`;
+          const qrCanvas = generateQrCanvas(cardUrl, 900);
+          ctx.drawImage(qrCanvas, 150, 110, 900, 900);
 
-            // 3. Center Divider
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(1100, 150);
-            ctx.lineTo(1100, 1250);
-            ctx.stroke();
+          // 4. Subtle Separator Line
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(100, 1080);
+          ctx.lineTo(W - 100, 1080);
+          ctx.stroke();
 
-            // Load both portraits
-            const srcAnsar = (typeof portraitLineartData !== 'undefined' && portraitLineartData.partner2) ? portraitLineartData.partner2 : 'assets/ansar-lineart.jpg';
-            const srcAsad = (typeof portraitLineartData !== 'undefined' && portraitLineartData.partner1) ? portraitLineartData.partner1 : 'assets/asad-lineart.jpg';
+          // 5. Load and Draw Person's Bust Image (Bottom Right)
+          const b64 = (typeof portraitLineartData !== 'undefined' && portraitLineartData[activePartner])
+            ? portraitLineartData[activePartner]
+            : (activePartner === 'partner1' ? 'assets/asad-lineart.jpg' : 'assets/ansar-lineart.jpg');
 
-            const [imgAnsar, imgAsad] = await Promise.all([loadImage(srcAnsar), loadImage(srcAsad)]);
+          const portraitImg = new Image();
+          portraitImg.onload = () => {
+            const portW = 620;
+            const portH = 760;
+            const portX = W - portW - 40; // 540
+            const portY = H - portH - 40; // 1200
+            ctx.drawImage(portraitImg, portX, portY, portW, portH);
 
-            // Left: Ansarullah
-            ctx.drawImage(imgAnsar, 110, 100, 880, 880);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-            ctx.beginPath();
-            ctx.moveTo(300, 1020);
-            ctx.lineTo(800, 1020);
-            ctx.stroke();
+            // 6. BOTTOM LEFT: Text
+            const textX = 110;
+            const nameParts = partner.name.trim().split(' ');
+            const firstName = nameParts[0].toUpperCase();
+            const lastName = nameParts.slice(1).join(' ').toUpperCase();
 
+            // Line 1: First Name (strong capital)
             ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'center';
+            ctx.textAlign = 'left';
             ctx.font = '900 68px "Space Grotesk", sans-serif';
-            ctx.fillText('ANSARULLAH K. P.', 550, 1120);
+            ctx.fillText(firstName, textX, 1220);
 
-            ctx.fillStyle = '#d1d5db';
-            ctx.font = '700 48px monospace, "Space Grotesk", sans-serif';
-            ctx.fillText(siteConfig.partners.partner2.phoneDisplay, 550, 1205);
-
-            // Right: Asadullah
-            ctx.drawImage(imgAsad, 1210, 100, 880, 880);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-            ctx.beginPath();
-            ctx.moveTo(1400, 1020);
-            ctx.lineTo(1900, 1020);
-            ctx.stroke();
-
-            ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'center';
+            // Line 2: Last Name on second line (strong capital)
             ctx.font = '900 68px "Space Grotesk", sans-serif';
-            ctx.fillText('ASADULLAH K. P.', 1650, 1120);
+            ctx.fillText(lastName, textX, 1340);
 
-            ctx.fillStyle = '#d1d5db';
+            // Line 3: Mobile Number from left to almost 3/4
+            ctx.fillStyle = '#e2e8f0';
             ctx.font = '700 48px monospace, "Space Grotesk", sans-serif';
-            ctx.fillText(siteConfig.partners.partner1.phoneDisplay, 1650, 1205);
+            ctx.fillText(partner.phoneDisplay, textX, 1500);
 
-            triggerDownload(canvas, 'Nexus_VisitingCard_Duo_000000.png');
+            // 7. Trigger HQ Download
+            canvas.toBlob((blob) => {
+              if (blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                }, 2000);
 
-          } else {
-            // INDIVIDUAL CARD: 1200 x 1600 px
-            canvas.width = 1200;
-            canvas.height = 1600;
-            const ctx = canvas.getContext('2d');
-            const partner = siteConfig.partners[currentMode];
+                modalCardPreview.src = url;
+                modalDownloadLink.href = url;
+                modalDownloadLink.download = filename;
+                showToast('✅ Visiting card downloaded!');
+              } else {
+                const dataUrl = canvas.toDataURL('image/png');
+                modalCardPreview.src = dataUrl;
+                modalDownloadLink.href = dataUrl;
+                modalDownloadLink.download = filename;
+                previewModal.classList.remove('hidden');
+                previewModal.classList.add('flex');
+              }
+            }, 'image/png');
+          };
 
-            // 1. Pure #000000 Black Background
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(0, 0, 1200, 1600);
+          portraitImg.onerror = (e) => {
+            console.error('Portrait load error:', e);
+            showToast('⚠️ Could not load portrait for download.');
+          };
 
-            // 2. Rounded Border
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-            ctx.lineWidth = 3;
-            drawRoundedRect(ctx, 40, 40, 1120, 1520, 50, false, true);
-
-            // 3. Portrait
-            const srcImg = (typeof portraitLineartData !== 'undefined' && portraitLineartData[currentMode]) ? portraitLineartData[currentMode] : (currentMode === 'partner1' ? 'assets/asad-lineart.jpg' : 'assets/ansar-lineart.jpg');
-            const img = await loadImage(srcImg);
-            ctx.drawImage(img, 100, 100, 1000, 1000);
-
-            // 4. Accent Line
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(350, 1170);
-            ctx.lineTo(850, 1170);
-            ctx.stroke();
-
-            // 5. Name
-            ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'center';
-            ctx.font = '900 78px "Space Grotesk", sans-serif';
-            ctx.fillText(partner.name.toUpperCase(), 600, 1290);
-
-            // 6. Phone
-            ctx.fillStyle = '#d1d5db';
-            ctx.font = '700 54px monospace, "Space Grotesk", sans-serif';
-            ctx.fillText(partner.phoneDisplay, 600, 1395);
-
-            triggerDownload(canvas, `Nexus_VisitingCard_${partner.name.replace(/[^a-zA-Z0-9]/g, '_')}_000000.png`);
-          }
+          portraitImg.src = b64;
 
         } catch (err) {
           console.error('Download error:', err);
@@ -474,37 +508,8 @@
         }
       });
 
-      function triggerDownload(canvas, filename) {
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => {
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-            }, 2000);
-
-            modalCardPreview.src = url;
-            modalDownloadLink.href = url;
-            modalDownloadLink.download = filename;
-            showToast('✅ Visiting card downloaded!');
-          } else {
-            const dataUrl = canvas.toDataURL('image/png');
-            modalCardPreview.src = dataUrl;
-            modalDownloadLink.href = dataUrl;
-            modalDownloadLink.download = filename;
-            previewModal.classList.remove('hidden');
-            previewModal.classList.add('flex');
-          }
-        }, 'image/png');
-      }
-
-      // Initial View
-      setMode(currentMode);
+      // Initial Render
+      renderCard(activePartner);
     });
   </script>
 </body>
